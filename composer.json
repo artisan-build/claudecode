@@ -1,0 +1,61 @@
+{
+	"name": "artisan-build/claudecode",
+	"description": "A Claude Code SDK for Laravel",
+	"type": "library",
+	"license": "MIT",
+	"require": {
+        "illuminate/support": "^11.36|^12.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^v3.0.2",
+        "orchestra/testbench": "^v9.9.0",
+        "pestphp/pest": "^v3.7.1",
+        "laravel/pint": "^1.19.0",
+        "phpstan/phpstan": "^2.1.0"
+    },
+	"autoload": {
+		"psr-4": {
+			"ArtisanBuild\\ClaudeCode\\": "src/",
+			"ArtisanBuild\\ClaudeCode\\Tests\\": "tests/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"ArtisanBuild\\ClaudeCode\\Providers\\ClaudeCodeServiceProvider"
+			],
+			"aliases": {
+				"ClaudeCode": "ArtisanBuild\\ClaudeCode\\Facades\\ClaudeCode"
+			}
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"pestphp/pest-plugin": true
+		}
+	},
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "clear": "@php vendor/bin/testbench package:purge-bench --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": [
+            "@composer run prepare",
+            "@php vendor/bin/testbench workbench:build --ansi"
+        ],
+        "start": [
+            "Composer\\Config::disableProcessTimeout",
+            "@composer run build",
+            "@php vendor/bin/testbench serve"
+        ],
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "lint": "vendor/bin/pint",
+        "stan": "vendor/bin/phpstan analyse --memory-limit=-1",
+        "ready": [
+            "@composer lint",
+            "@composer stan",
+            "@composer test"
+        ]
+    }
+}
