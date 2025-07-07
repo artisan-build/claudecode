@@ -7,19 +7,11 @@ use ArtisanBuild\ClaudeCode\Messages\Message;
 
 class ClaudeCodeSession
 {
-    protected ClaudeCode $client;
-
     protected array $messages = [];
-
-    protected ?ClaudeCodeOptions $options = null;
 
     protected int $turnCount = 0;
 
-    public function __construct(ClaudeCode $client, ?ClaudeCodeOptions $options = null)
-    {
-        $this->client = $client;
-        $this->options = $options;
-    }
+    public function __construct(protected ClaudeCode $client, protected ?ClaudeCodeOptions $options = null) {}
 
     /**
      * Send a prompt and get the response
@@ -52,7 +44,7 @@ class ClaudeCodeSession
             $query->withOptions($this->options);
         }
 
-        $query->stream(function (Message $message) use ($callback) {
+        $query->stream(function (Message $message) use ($callback): void {
             $this->messages[] = $message;
             $callback($message);
         });

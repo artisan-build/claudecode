@@ -8,8 +8,6 @@ use Illuminate\Support\Collection;
 
 class ClaudeCodeTask
 {
-    protected string $prompt;
-
     protected ?ClaudeCodeOptions $options = null;
 
     protected array $messages = [];
@@ -18,10 +16,7 @@ class ClaudeCodeTask
 
     protected ?string $error = null;
 
-    public function __construct(string $prompt)
-    {
-        $this->prompt = $prompt;
-    }
+    public function __construct(protected string $prompt) {}
 
     public static function create(string $prompt): self
     {
@@ -99,7 +94,7 @@ class ClaudeCodeTask
                 $query->withOptions($this->options);
             }
 
-            $query->stream(function (Message $message) use ($callback) {
+            $query->stream(function (Message $message) use ($callback): void {
                 $this->messages[] = $message;
                 $callback($message);
             });

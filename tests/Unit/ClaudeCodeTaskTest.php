@@ -3,15 +3,11 @@
 use ArtisanBuild\ClaudeCode\Facades\ClaudeCode;
 use ArtisanBuild\ClaudeCode\Messages\AssistantMessage;
 use ArtisanBuild\ClaudeCode\Messages\ResultMessage;
+use ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeTask;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeTools;
 
-beforeEach(function () {
-    ClaudeCode::shouldReceive('query')->andReturnSelf();
-    ClaudeCode::shouldReceive('withOptions')->andReturnSelf();
-});
-
-it('creates and executes a task', function () {
+it('creates and executes a task', function (): void {
     $mockMessages = [
         new AssistantMessage([
             'content' => [['type' => 'text', 'text' => 'Task completed successfully']],
@@ -19,7 +15,11 @@ it('creates and executes a task', function () {
         new ResultMessage(['success' => true]),
     ];
 
-    ClaudeCode::shouldReceive('execute')->andReturn($mockMessages);
+    $mockQuery = Mockery::mock(ClaudeCodeQuery::class);
+    $mockQuery->shouldReceive('withOptions')->andReturnSelf();
+    $mockQuery->shouldReceive('execute')->andReturn($mockMessages);
+
+    ClaudeCode::shouldReceive('query')->andReturn($mockQuery);
 
     $task = ClaudeCodeTask::create('Write a test')
         ->withModel('claude-3-5-sonnet-20241022')
@@ -32,8 +32,12 @@ it('creates and executes a task', function () {
     expect($task->getError())->toBeNull();
 });
 
-it('handles task failures', function () {
-    ClaudeCode::shouldReceive('execute')->andThrow(new Exception('API error'));
+it('handles task failures', function (): void {
+    $mockQuery = Mockery::mock(ClaudeCodeQuery::class);
+    $mockQuery->shouldReceive('withOptions')->andReturnSelf();
+    $mockQuery->shouldReceive('execute')->andThrow(new Exception('API error'));
+
+    ClaudeCode::shouldReceive('query')->andReturn($mockQuery);
 
     $task = ClaudeCodeTask::create('Failing task')->run();
 
@@ -42,7 +46,7 @@ it('handles task failures', function () {
     expect($task->getResult())->toBeNull();
 });
 
-it('extracts tool usage information', function () {
+it('extracts tool usage information', function (): void {
     $mockMessages = [
         new AssistantMessage([
             'content' => [
@@ -53,7 +57,11 @@ it('extracts tool usage information', function () {
         ]),
     ];
 
-    ClaudeCode::shouldReceive('execute')->andReturn($mockMessages);
+    $mockQuery = Mockery::mock(ClaudeCodeQuery::class);
+    $mockQuery->shouldReceive('withOptions')->andReturnSelf();
+    $mockQuery->shouldReceive('execute')->andReturn($mockMessages);
+
+    ClaudeCode::shouldReceive('query')->andReturn($mockQuery);
 
     $task = ClaudeCodeTask::create('Process files')->run();
 

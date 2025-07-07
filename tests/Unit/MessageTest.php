@@ -4,7 +4,7 @@ use ArtisanBuild\ClaudeCode\Messages\AssistantMessage;
 use ArtisanBuild\ClaudeCode\Messages\MessageFactory;
 use ArtisanBuild\ClaudeCode\Messages\ResultMessage;
 
-it('creates messages from factory', function () {
+it('creates messages from factory', function (): void {
     $assistantData = [
         'type' => 'assistant',
         'id' => 'msg_123',
@@ -20,7 +20,7 @@ it('creates messages from factory', function () {
     expect($message->id)->toBe('msg_123');
 });
 
-it('extracts text content from messages', function () {
+it('extracts text content from messages', function (): void {
     $message = new AssistantMessage([
         'content' => [
             ['type' => 'text', 'text' => 'Part 1'],
@@ -32,7 +32,7 @@ it('extracts text content from messages', function () {
     expect($message->getTextContent())->toBe("Part 1\nPart 2");
 });
 
-it('detects tool usage in messages', function () {
+it('detects tool usage in messages', function (): void {
     $message = new AssistantMessage([
         'content' => [
             ['type' => 'text', 'text' => 'Let me read that file'],
@@ -45,7 +45,7 @@ it('detects tool usage in messages', function () {
     expect($message->getToolUses()[0]['name'])->toBe('Read');
 });
 
-it('handles result messages with success and error states', function () {
+it('handles result messages with success and error states', function (): void {
     $successResult = new ResultMessage([
         'success' => true,
         'content' => [['type' => 'text', 'text' => 'Task completed']],

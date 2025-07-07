@@ -4,7 +4,6 @@ namespace ArtisanBuild\ClaudeCode;
 
 use ArtisanBuild\ClaudeCode\Contracts\ClaudeCodeClient;
 use ArtisanBuild\ClaudeCode\Exceptions\CLINotFoundException;
-use ArtisanBuild\ClaudeCode\Exceptions\ClaudeCodeException;
 use ArtisanBuild\ClaudeCode\Exceptions\ProcessException;
 use ArtisanBuild\ClaudeCode\Messages\Message;
 use ArtisanBuild\ClaudeCode\Messages\MessageFactory;
@@ -12,24 +11,20 @@ use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process as SymfonyProcess;
 
 class ClaudeCode implements ClaudeCodeClient
 {
     protected string $cliPath = 'claude';
 
-    protected ?ClaudeCodeOptions $defaultOptions = null;
-
     protected int $timeout = 120;
 
     public function __construct(
         ?string $cliPath = null,
-        ?ClaudeCodeOptions $defaultOptions = null,
+        protected ?ClaudeCodeOptions $defaultOptions = null,
         ?int $timeout = null
     ) {
-        $this->cliPath = $cliPath ?? config('claude-code.cli_path', 'claude');
-        $this->defaultOptions = $defaultOptions;
-        $this->timeout = $timeout ?? config('claude-code.timeout', 120);
+        $this->cliPath = $cliPath ?? (string) config('claude-code.cli_path', 'claude');
+        $this->timeout = $timeout ?? (int) config('claude-code.timeout', 120);
 
         $this->validateCLI();
     }
@@ -53,24 +48,22 @@ class ClaudeCode implements ClaudeCodeClient
                 $process->env(['ANTHROPIC_API_KEY' => $apiKey]);
             }
 
-            $result = $process->run(function (string $type, string $output) use (&$messages) {
-                if ($type === SymfonyProcess::ERR) {
-                    throw new ProcessException("Claude Code error: $output");
-                }
-
-                $lines = array_filter(explode("\n", trim($output)));
-                foreach ($lines as $line) {
-                    if ($message = $this->parseMessage($line)) {
-                        $messages[] = $message;
-                    }
-                }
-            });
+            $result = $process->run();
 
             if (! $result->successful()) {
                 throw new ProcessException(
                     "Claude Code process failed with exit code: {$result->exitCode()}",
                     $result->exitCode()
                 );
+            }
+
+            // Parse the output
+            $output = $result->output();
+            $lines = array_filter(explode("\n", trim($output)));
+            foreach ($lines as $line) {
+                if ($message = $this->parseMessage($line)) {
+                    $messages[] = $message;
+                }
             }
 
             return $messages;
@@ -92,23 +85,46 @@ class ClaudeCode implements ClaudeCodeClient
                 $process->env(['ANTHROPIC_API_KEY' => $apiKey]);
             }
 
-            $process->run(function (string $type, string $output) use ($callback) {
-                if ($type === SymfonyProcess::ERR) {
-                    throw new ProcessException("Claude Code error: $output");
-                }
+            // Use the running method to stream output
+            $result = $process->start();
 
-                $lines = array_filter(explode("\n", trim($output)));
-                foreach ($lines as $line) {
-                    if ($message = $this->parseMessage($line)) {
-                        $callback($message);
+            // Read output as it becomes available
+            while ($result->running()) {
+                $output = $result->latestOutput();
+                if ($output) {
+                    $lines = array_filter(explode("\n", trim($output)));
+                    foreach ($lines as $line) {
+                        if ($message = $this->parseMessage($line)) {
+                            $callback($message);
+                        }
                     }
                 }
-            });
+                usleep(100000); // Sleep for 100ms to avoid busy waiting
+            }
 
-            if (! $process->successful()) {
+            // Wait for process to finish and get final result
+            $finalResult = $result->wait();
+
+            // Get any remaining output
+            $output = $finalResult->output();
+            if ($output) {
+                // Only process new lines since last check
+                $processedOutput = $result->output();
+                $newOutput = substr($output, strlen($processedOutput));
+                if ($newOutput) {
+                    $lines = array_filter(explode("\n", trim($newOutput)));
+                    foreach ($lines as $line) {
+                        if ($message = $this->parseMessage($line)) {
+                            $callback($message);
+                        }
+                    }
+                }
+            }
+
+            if (! $finalResult->successful()) {
                 throw new ProcessException(
-                    "Claude Code process failed with exit code: {$process->exitCode()}",
-                    $process->exitCode()
+                    "Claude Code process failed with exit code: {$finalResult->exitCode()}",
+                    $finalResult->exitCode()
                 );
             }
         } catch (ProcessFailedException $e) {
@@ -169,7 +185,7 @@ class ClaudeCode implements ClaudeCodeClient
             }
 
             return MessageFactory::create($data);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

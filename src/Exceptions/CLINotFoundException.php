@@ -2,6 +2,4 @@
 
 namespace ArtisanBuild\ClaudeCode\Exceptions;
 
-class CLINotFoundException extends ClaudeCodeException
-{
-}
+class CLINotFoundException extends ClaudeCodeException {}

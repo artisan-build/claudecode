@@ -19,6 +19,7 @@ class ResultMessage extends Message
         $this->exitCode = $data['exit_code'] ?? null;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [

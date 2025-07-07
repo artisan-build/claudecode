@@ -2,7 +2,7 @@
 
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;
 
-it('creates options with fluent interface', function () {
+it('creates options with fluent interface', function (): void {
     $options = ClaudeCodeOptions::create()
         ->systemPrompt('Be helpful')
         ->maxTurns(10)
@@ -19,7 +19,7 @@ it('creates options with fluent interface', function () {
     expect($options->allowedTools)->toBe(['Read', 'Write']);
 });
 
-it('converts options to array filtering null values', function () {
+it('converts options to array filtering null values', function (): void {
     $options = ClaudeCodeOptions::create()
         ->systemPrompt('Be helpful')
         ->maxTurns(5);

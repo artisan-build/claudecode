@@ -49,7 +49,7 @@ return [
         'systemPrompt' => env('CLAUDE_SYSTEM_PROMPT', null),
         'permissionMode' => env('CLAUDE_PERMISSION_MODE', null), // 'auto', 'allow', 'confirm', 'deny'
         'workingDirectory' => env('CLAUDE_WORKING_DIRECTORY', null),
-        'allowedTools' => env('CLAUDE_ALLOWED_TOOLS') ? explode(',', env('CLAUDE_ALLOWED_TOOLS')) : null,
+        'allowedTools' => env('CLAUDE_ALLOWED_TOOLS') ? explode(',', (string) env('CLAUDE_ALLOWED_TOOLS')) : null,
     ],
 
     /*

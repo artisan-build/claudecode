@@ -7,16 +7,10 @@ use ArtisanBuild\ClaudeCode\Messages\Message;
 
 class ClaudeCodeQuery
 {
-    protected ClaudeCode $client;
-
-    protected string $prompt;
-
     protected ClaudeCodeOptions $options;
 
-    public function __construct(ClaudeCode $client, string $prompt, ?ClaudeCodeOptions $defaultOptions = null)
+    public function __construct(protected ClaudeCode $client, protected string $prompt, ?ClaudeCodeOptions $defaultOptions = null)
     {
-        $this->client = $client;
-        $this->prompt = $prompt;
         $this->options = $defaultOptions ? clone $defaultOptions : new ClaudeCodeOptions;
     }
 
