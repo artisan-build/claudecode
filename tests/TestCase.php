@@ -2,14 +2,26 @@
 
 namespace ArtisanBuild\ClaudeCode\Tests;
 
-use ArtisanBuild\ClaudeCode\ClaudeCode;
-use ArtisanBuild\ClaudeCode\Contracts\ClaudeCodeClient;
 use ArtisanBuild\ClaudeCode\Providers\ClaudeCodeServiceProvider;
-use ArtisanBuild\ClaudeCode\Tests\Mocks\MockClaudeCode;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Override;
 
+/**
+ * Remove the .forked from the end of this filename to enable stand-alone testing on this package when forked.
+ */
 class TestCase extends Orchestra
 {
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Factory::guessFactoryNamesUsing(
+            fn (string $modelName) => 'ArtisanBuild\\ClaudeCode\\Database\\Factories\\'.class_basename($modelName).'Factory'
+        );
+    }
+
     protected function getPackageProviders($app)
     {
         return [
@@ -21,11 +33,10 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        // Override the service provider's binding to use mock implementation
-        $this->afterApplicationCreated(function (): void {
-            $this->app->singleton(ClaudeCodeClient::class, MockClaudeCode::class);
-            $this->app->singleton(ClaudeCode::class, MockClaudeCode::class);
-            $this->app->singleton('claude-code', MockClaudeCode::class);
-        });
+        /*
+         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/database/migrations') as $migration) {
+            (include $migration->getRealPath())->up();
+         }
+         */
     }
 }
