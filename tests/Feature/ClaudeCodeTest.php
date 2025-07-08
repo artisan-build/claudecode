@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Process;
 
 it('validates CLI availability on construction', function (): void {
-    App::detectEnvironment(fn() => 'local');
+    App::detectEnvironment(fn () => 'local');
 
     Process::fake([
         '*' => Process::result(exitCode: 1),
