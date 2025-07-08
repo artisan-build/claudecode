@@ -4,9 +4,13 @@ use ArtisanBuild\ClaudeCode\ClaudeCode;
 use ArtisanBuild\ClaudeCode\Exceptions\CLINotFoundException;
 use ArtisanBuild\ClaudeCode\Messages\AssistantMessage;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;
+use ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Process;
 
 it('validates CLI availability on construction', function (): void {
+    App::detectEnvironment(fn() => 'local');
+
     Process::fake([
         '*' => Process::result(exitCode: 1),
     ]);
@@ -23,7 +27,7 @@ it('creates a query builder', function (): void {
     $client = new ClaudeCode;
     $query = $client->query('Test prompt');
 
-    expect($query)->toBeInstanceOf(\ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery::class);
+    expect($query)->toBeInstanceOf(ClaudeCodeQuery::class);
     expect($query->getPrompt())->toBe('Test prompt');
 });
 
@@ -146,5 +150,5 @@ it('handles streaming responses', function (): void {
     expect(true)->toBeTrue();
 
     // Verify a process was started
-    Process::assertRanTimes(fn ($process) => is_array($process->command) && $process->command[0] === 'claude', 2); // One for version check, one for the actual command
+    Process::assertRanTimes(fn ($process) => is_array($process->command) && $process->command[0] === 'claude', 1); // Skips the version check in testing, so just one for the actual command
 });
