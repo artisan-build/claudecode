@@ -21,9 +21,11 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        // Use mock implementation in tests to avoid CLI validation
-        $this->app->bind(ClaudeCodeClient::class, MockClaudeCode::class);
-        $this->app->bind(ClaudeCode::class, MockClaudeCode::class);
-        $this->app->bind('claude-code', MockClaudeCode::class);
+        // Override the service provider's binding to use mock implementation
+        $this->afterApplicationCreated(function (): void {
+            $this->app->singleton(ClaudeCodeClient::class, MockClaudeCode::class);
+            $this->app->singleton(ClaudeCode::class, MockClaudeCode::class);
+            $this->app->singleton('claude-code', MockClaudeCode::class);
+        });
     }
 }
