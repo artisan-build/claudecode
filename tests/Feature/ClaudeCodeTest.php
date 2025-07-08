@@ -120,12 +120,10 @@ it('passes API key as environment variable', function (): void {
 
     // Process facade may not capture env vars properly in tests
     // At least verify the process was run
-    Process::assertRan(function ($process) {
-        return is_array($process->command)
-            && count($process->command) >= 2
-            && $process->command[0] === 'claude'
-            && $process->command[1] === 'code';
-    });
+    Process::assertRan(fn ($process) => is_array($process->command)
+        && count($process->command) >= 2
+        && $process->command[0] === 'claude'
+        && $process->command[1] === 'code');
 });
 
 it('handles streaming responses', function (): void {
@@ -148,7 +146,5 @@ it('handles streaming responses', function (): void {
     expect(true)->toBeTrue();
 
     // Verify a process was started
-    Process::assertRanTimes(function ($process) {
-        return is_array($process->command) && $process->command[0] === 'claude';
-    }, 2); // One for version check, one for the actual command
+    Process::assertRanTimes(fn ($process) => is_array($process->command) && $process->command[0] === 'claude', 2); // One for version check, one for the actual command
 });
