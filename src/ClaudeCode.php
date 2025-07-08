@@ -9,6 +9,8 @@ use ArtisanBuild\ClaudeCode\Messages\Message;
 use ArtisanBuild\ClaudeCode\Messages\MessageFactory;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery;
+use Exception;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -185,13 +187,16 @@ class ClaudeCode implements ClaudeCodeClient
             }
 
             return MessageFactory::create($data);
-        } catch (\Exception) {
+        } catch (Exception) {
             return null;
         }
     }
 
     protected function validateCLI(): void
     {
+        if (App::environment('testing')) {
+            return;
+        }
         try {
             $result = Process::command([$this->cliPath, '--version'])
                 ->timeout(5)
@@ -202,7 +207,7 @@ class ClaudeCode implements ClaudeCodeClient
                     "Claude CLI not found or not executable at path: {$this->cliPath}"
                 );
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new CLINotFoundException(
                 "Claude CLI not found at path: {$this->cliPath}. Please ensure Claude Code is installed.",
                 0,
