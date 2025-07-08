@@ -17,8 +17,9 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function setUp(): void
     {
+        parent::setUp();
         config()->set('database.default', 'testing');
 
         // Override the service provider's binding to use mock implementation
