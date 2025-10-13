@@ -47,13 +47,7 @@ abstract class Message
 
     public function hasToolUse(): bool
     {
-        foreach ($this->content as $block) {
-            if (isset($block['type']) && $block['type'] === 'tool_use') {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->content, fn ($block) => isset($block['type']) && $block['type'] === 'tool_use');
     }
 
     public function getToolUses(): array
