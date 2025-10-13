@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use ArtisanBuild\ClaudeCode\ClaudeCode;
 use ArtisanBuild\ClaudeCode\Exceptions\CLINotFoundException;
 use ArtisanBuild\ClaudeCode\Messages\AssistantMessage;

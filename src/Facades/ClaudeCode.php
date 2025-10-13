@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArtisanBuild\ClaudeCode\Facades;
 
 use ArtisanBuild\ClaudeCode\Contracts\ClaudeCodeClient;

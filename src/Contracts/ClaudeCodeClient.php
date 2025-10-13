@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArtisanBuild\ClaudeCode\Contracts;
 
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;

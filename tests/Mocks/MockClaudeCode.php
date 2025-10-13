@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArtisanBuild\ClaudeCode\Tests\Mocks;
 
 use ArtisanBuild\ClaudeCode\ClaudeCode;

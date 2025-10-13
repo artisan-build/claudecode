@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use ArtisanBuild\ClaudeCode\Support\ClaudeCodeOptions;
 
 it('creates options with fluent interface', function (): void {

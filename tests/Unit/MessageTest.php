@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use ArtisanBuild\ClaudeCode\Messages\AssistantMessage;
 use ArtisanBuild\ClaudeCode\Messages\MessageFactory;
 use ArtisanBuild\ClaudeCode\Messages\ResultMessage;
