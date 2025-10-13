@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ArtisanBuild\ClaudeCode\Messages;
 
+use Override;
+
 class ResultMessage extends Message
 {
     public bool $success;
@@ -21,7 +23,7 @@ class ResultMessage extends Message
         $this->exitCode = $data['exit_code'] ?? null;
     }
 
-    #[\Override]
+    #[Override]
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [

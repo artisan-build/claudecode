@@ -14,6 +14,7 @@ use ArtisanBuild\ClaudeCode\Support\ClaudeCodeQuery;
 use Exception;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Sleep;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class ClaudeCode implements ClaudeCodeClient
@@ -103,7 +104,7 @@ class ClaudeCode implements ClaudeCodeClient
                         }
                     }
                 }
-                \Illuminate\Support\Sleep::usleep(100000); // Sleep for 100ms to avoid busy waiting
+                Sleep::usleep(100000); // Sleep for 100ms to avoid busy waiting
             }
 
             // Wait for process to finish and get final result
