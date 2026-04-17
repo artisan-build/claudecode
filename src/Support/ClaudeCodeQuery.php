@@ -92,7 +92,7 @@ class ClaudeCodeQuery
         $content = [];
 
         foreach ($messages as $message) {
-            if ($message->type === 'assistant' && isset($message->content)) {
+            if ($message->type === 'assistant') {
                 foreach ($message->content as $block) {
                     if (isset($block['type']) && $block['type'] === 'text' && isset($block['text'])) {
                         $content[] = $block['text'];
